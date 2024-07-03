@@ -319,7 +319,14 @@ function get_host_suggestions($q, $max_results=10) {
     $results = array();
 
     // If we are not using views, limit to the default
-    if (!$conf['dns_views']) $limit_to_view = 'dns_view_id = 0 AND ';
+    $limit_to_view = 'dns_view_id = 0 AND ';
+    if ($conf['dns_views'] && strstr($q, '/')) {
+        list($dnsview, $q) = explode('/', $q);
+        list($status, $viewrows, $view) = db_get_record($onadb, 'dns_views', array('name' => strtoupper($dnsview)));
+        if ($viewrows) {
+            $limit_to_view = 'dns_view_id = '.$view['id'].' AND ';
+        }
+    }
 
     // If there is a dot in what is typed, split that out and check the right hand side for domains first
     // then use any found domainid in the search
@@ -385,7 +392,14 @@ function get_a_record_suggestions($q, $max_results=10) {
     $results = array();
 
     // If we are not using views, limit to the default
-    if (!$conf['dns_views']) $limit_to_view = 'dns_view_id = 0 AND ';
+    $limit_to_view = 'dns_view_id = 0 AND ';
+    if ($conf['dns_views'] && strstr($q, '/')) {
+        list($dnsview, $q) = explode('/', $q);
+        list($status, $viewrows, $view) = db_get_record($onadb, 'dns_views', array('name' => strtoupper($dnsview)));
+        if ($viewrows) {
+            $limit_to_view = 'dns_view_id = '.$view['id'].' AND ';
+        }
+    }
 
     // wildcard the query before searching
     $q = $q . '%';
